@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.bootcamp.DeviceMonitorManagement" activate="activate" deactivate="deactivate">
-    <implementation class="org.onosproject.bootcamp.DeviceMonitorManagement"/>
+<scr:component xmlns:scr="http://www.osgi.org/xmlns/scr/v1.1.0" immediate="true" name="org.onosproject.devicemonitor.impl.DeviceMonitorManagement" activate="activate" deactivate="deactivate">
+    <implementation class="org.onosproject.devicemonitor.impl.DeviceMonitorManagement"/>
     <service servicefactory="false">
-        <provide interface="org.onosproject.bootcamp.DeviceMonitorService"/>
-        <provide interface="org.onosproject.bootcamp.DeviceMonitorAdminService"/>
+        <provide interface="org.onosproject.devicemonitor.api.DeviceMonitorService"/>
+        <provide interface="org.onosproject.devicemonitor.api.DeviceMonitorAdminService"/>
     </service>
-    <property name="service.pid" value="org.onosproject.bootcamp.DeviceMonitorManagement"/>
+    <property name="service.pid" value="org.onosproject.devicemonitor.impl.DeviceMonitorManagement"/>
     <reference name="storageService" interface="org.onosproject.store.service.StorageService" cardinality="1..1" policy="static" bind="bindStorageService" unbind="unbindStorageService"/>
     <reference name="clockService" interface="org.onosproject.store.service.LogicalClockService" cardinality="1..1" policy="static" bind="bindClockService" unbind="unbindClockService"/>
     <reference name="deviceClockService" interface="org.onosproject.net.device.DeviceClockService" cardinality="1..1" policy="static" bind="bindDeviceClockService" unbind="unbindDeviceClockService"/>

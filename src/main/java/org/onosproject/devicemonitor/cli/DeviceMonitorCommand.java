@@ -1,4 +1,4 @@
-package org.onosproject.bootcamp;
+package org.onosproject.devicemonitor.cli;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
@@ -6,15 +6,16 @@ import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.onosproject.cli.AbstractShellCommand;
+import org.onosproject.devicemonitor.api.DeviceMonitorAdminService;
+import org.onosproject.devicemonitor.api.DeviceMonitorService;
 import org.onosproject.net.DeviceId;
-import org.onosproject.net.device.DeviceAdminService;
 import org.onosproject.net.device.DeviceService;
 
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by cr on 16-4-15.
+ * Commands to get device connect times information and config device monitor parameter.
  */
 @Command(scope = "onos", name = "dm",
         description = "Device Monitor")
@@ -59,10 +60,11 @@ public class DeviceMonitorCommand extends AbstractShellCommand {
             for (Map.Entry<DeviceId, Long> deviceCount : deviceCountSet) {
                 print("DeviceId:%s  connnetTimes:%s", deviceCount.getKey(), deviceCount.getValue());
             }
+            print("");
             Set<DeviceId> forbiddenSet = deviceMonitorService.getForbiddenDevices();
             print("Forbidden devices list:");
             for (DeviceId deviceId : forbiddenSet) {
-                print(deviceId.toString());
+                print("DeviceId:%s  connnetTimes:%s", deviceId.toString(), deviceMonitorService.getDeviceCount(deviceId));
             }
             return;
         }

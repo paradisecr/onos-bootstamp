@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Bnd-LastModified: 1460754076829
+Bnd-LastModified: 1460758046790
 Build-Jdk: 1.8.0_77
 Built-By: cr
 Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
@@ -10,23 +10,25 @@ Bundle-Name: device-monitor
 Bundle-SymbolicName: org.onosproject.device-monitor
 Bundle-Version: 1.5.0
 Created-By: Apache Maven Bundle Plugin
-Export-Package: org.onosproject;uses:="org.onosproject.ui";version="1.5.
- 0",org.onosproject.bootcamp;uses:="org.apache.karaf.shell.commands,org.
- onosproject.cli,org.onosproject.mastership,org.onosproject.net,org.onos
- project.net.device,org.onosproject.store.service";version="1.5.0"
+Export-Package: org.onosproject.devicemonitor.gui;uses:="org.onosproject
+ .ui";version="1.5.0",org.onosproject.devicemonitor.cli;uses:="org.apach
+ e.karaf.shell.commands,org.onosproject.cli,org.onosproject.net.device";
+ version="1.5.0",org.onosproject.devicemonitor.api;uses:="org.onosprojec
+ t.net";version="1.5.0"
 Import-Package: com.fasterxml.jackson.databind;version="[2.7,3)",com.fas
  terxml.jackson.databind.node;version="[2.7,3)",com.google.common.collec
  t;version="[19.0,20)",org.apache.commons.lang;version="[2.6,3)",org.apa
  che.karaf.shell.commands;version="[3.0,4)",org.onlab.util;version="[1.5
- ,2)",org.onosproject.bootcamp,org.onosproject.cli;version="[1.5,2)",org
- .onosproject.event;version="[1.5,2)",org.onosproject.mastership;version
- ="[1.5,2)",org.onosproject.net;version="[1.5,2)",org.onosproject.net.de
- vice;version="[1.5,2)",org.onosproject.store.primitives;version="[1.5,2
- )",org.onosproject.store.serializers;version="[1.5,2)",org.onosproject.
- store.service;version="[1.5,2)",org.onosproject.ui;version="[1.5,2)",or
- g.onosproject.ui.table;version="[1.5,2)",org.osgi.service.blueprint;ver
- sion="[1.0.0,2.0.0)",org.slf4j;version="[1.7,2)"
+ ,2)",org.onosproject.cli;version="[1.5,2)",org.onosproject.devicemonito
+ r.api,org.onosproject.event;version="[1.5,2)",org.onosproject.mastershi
+ p;version="[1.5,2)",org.onosproject.net;version="[1.5,2)",org.onosproje
+ ct.net.device;version="[1.5,2)",org.onosproject.store.primitives;versio
+ n="[1.5,2)",org.onosproject.store.serializers;version="[1.5,2)",org.ono
+ sproject.store.service;version="[1.5,2)",org.onosproject.ui;version="[1
+ .5,2)",org.onosproject.ui.table;version="[1.5,2)",org.osgi.service.blue
+ print;version="[1.0.0,2.0.0)",org.slf4j;version="[1.7,2)"
 Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
-Service-Component: OSGI-INF/org.onosproject.AppUiTableComponent.xml,OSGI
- -INF/org.onosproject.bootcamp.DeviceMonitorManagement.xml
+Service-Component: OSGI-INF/org.onosproject.devicemonitor.gui.AppUiTable
+ Component.xml,OSGI-INF/org.onosproject.devicemonitor.impl.DeviceMonitor
+ Management.xml
 Tool: Bnd-3.0.0.201509101326

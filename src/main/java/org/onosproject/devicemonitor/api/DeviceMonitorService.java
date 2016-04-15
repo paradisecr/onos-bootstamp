@@ -1,4 +1,4 @@
-package org.onosproject.bootcamp;
+package org.onosproject.devicemonitor.api;
 
 import org.onosproject.net.DeviceId;
 
@@ -6,13 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by cr on 16-4-15.
+ * Service for interacting with the device monitor module to get device up/down times.
  */
 public interface DeviceMonitorService {
     Set<Map.Entry<DeviceId, Long>> getDeviceCountAll();
     Long getDeviceCount(DeviceId deviceId);
     Set<DeviceId> getForbiddenDevices();
-//    Set<DeviceId> getWhiteDevices();
     long getDeviceMaxConnectTimes();
     boolean isDorbiddenDevice(DeviceId deviceId);
 }

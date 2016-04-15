@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onosproject;
+package org.onosproject.devicemonitor.gui;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.felix.scr.annotations.Activate;

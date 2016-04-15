@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.onosproject;
+package org.onosproject.devicemonitor.gui;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableSet;
-import org.onosproject.bootcamp.DeviceMonitorService;
+import org.onosproject.devicemonitor.api.DeviceMonitorService;
 import org.onosproject.cli.AbstractShellCommand;
 import org.onosproject.net.DeviceId;
 import org.onosproject.ui.RequestHandler;
@@ -145,7 +145,7 @@ public class AppUiTableMessageHandler extends UiMessageHandler {
                 data.put(ID, item.id());
                 data.put(LABEL, item.label());
                 data.put(CODE, item.code());
-                data.put(COMMENT, "This is a forbidden device for to many connect times.");
+                data.put(COMMENT, "The device is a forbidden for too many up/down.");
             }
 
             sendMessage(SAMPLE_TABLE_DETAIL_RESP, 0, rootNode);

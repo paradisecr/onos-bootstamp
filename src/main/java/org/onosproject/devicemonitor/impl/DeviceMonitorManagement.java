@@ -1,9 +1,9 @@
-package org.onosproject.bootcamp;
+package org.onosproject.devicemonitor.impl;
 
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.apache.felix.scr.annotations.*;
 import org.onlab.util.KryoNamespace;
+import org.onosproject.devicemonitor.api.DeviceMonitorAdminService;
+import org.onosproject.devicemonitor.api.DeviceMonitorService;
 import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by cr on 16-4-15.
+ * Monitor and record device up/down times and disable devices which connect too much.
  */
 @Component(immediate = true)
 @Service
@@ -58,10 +58,11 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
     @Activate
     protected void activate() {
         log.info("Started");
-        //create data set
+        //Create distributed data set to record the monitor data.
         createStorage();
+        //Set default device connect time limit.
         maxConnnectTimes.set(DEFAULT_MAX);
-        //add DeviceListener to DeviceService;
+        //Add DeviceListener to DeviceService to monitor the device up/down event.
         deviceListener = new InnerDeviceListener();
         deviceService.addListener(deviceListener);
     }
@@ -70,17 +71,19 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
     protected void deactivate() {
         //remove DeviceListener from DeviceService
         deviceService.removeListener(deviceListener);
-        //clear all data set
-        //destroyStorage();
+        //Clear all data set we use when App is deactivited.
+        destroyStorage();
         log.info("Stopped");
     }
 
     private void  createStorage() {
+        //Create DistributedSet to record forbidden devices.
         forbiddenDevices = storageService.<DeviceId>setBuilder()
                 .withName("forbidden-devices")
                 .withSerializer(Serializer.using(KryoNamespaces.API))
                 .build()
                 .asDistributedSet();
+        //Create AtomicCounter to save the connect limit.
         maxConnnectTimes = storageService.atomicCounterBuilder()
                 .withName("max-con-count")
                 .build()
@@ -99,28 +102,36 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
         }
     }
 
+    /**
+     * Handle a device connect event.
+     * @param device
+     */
     private void deviceConnect(Device device) {
         log.info("deviceConnect method is being called.");
         DeviceId deviceId = device.id();
+        //Get/Create a AtomicCounter linked to a deviceId.
         AtomicCounter prvCount = storageService.atomicCounterBuilder()
                 .withName(deviceId.toString())
                 .build()
                 .asAtomicCounter();
         prvCount.incrementAndGet();
+        //If the device connect times exceed the limits, disable id.
         if (isDorbiddenDevice(deviceId)) {
             handleForbidenConnect(deviceId);
             return;
         }
+        //Check if the device connect times exceed the limits,
+        //if so, add it to the forbidden set.
         if (prvCount.get() >= maxConnnectTimes.get()) {
             forbiddenDevices.add(deviceId);
         }
     }
 
-    private void forbiddDevice(DeviceId deviceId) {
-        forbiddenDevices.add(deviceId);
-    }
 
-
+    /**
+     * Handle a forbiden device connect, disable the connect.
+     * @param deviceId
+     */
     private void handleForbidenConnect(DeviceId deviceId) {
         deviceAdminService.removeDevice(deviceId);
     }
@@ -177,7 +188,7 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
         for (Map.Entry<DeviceId, Long> deviceCountMap : getDeviceCountAll()) {
             if (getDeviceCount(deviceCountMap.getKey()) < maxConnnectTimes.get()) {
                 forbiddenDevices.remove(deviceCountMap.getKey());
-            } else if (getDeviceCount(deviceCountMap.getKey()) < maxConnnectTimes.get()) {
+            } else if (getDeviceCount(deviceCountMap.getKey()) >= maxConnnectTimes.get()) {
                 forbiddenDevices.add(deviceCountMap.getKey());
             }
         }
