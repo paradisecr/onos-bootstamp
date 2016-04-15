@@ -14,4 +14,5 @@ public interface DeviceMonitorService {
     Set<DeviceId> getForbiddenDevices();
 //    Set<DeviceId> getWhiteDevices();
     long getDeviceMaxConnectTimes();
+    boolean isDorbiddenDevice(DeviceId deviceId);
 }

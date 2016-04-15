@@ -7,15 +7,11 @@ import org.apache.karaf.shell.commands.Argument;
 import org.apache.karaf.shell.commands.Command;
 import org.onosproject.cli.AbstractShellCommand;
 import org.onosproject.net.DeviceId;
+import org.onosproject.net.device.DeviceAdminService;
 import org.onosproject.net.device.DeviceService;
-import org.onosproject.store.service.AtomicCounter;
-import org.onosproject.store.service.DistributedSet;
-import org.onosproject.store.service.EventuallyConsistentMap;
-import org.onosproject.store.service.StorageService;
 
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by cr on 16-4-15.
@@ -24,7 +20,9 @@ import java.util.concurrent.atomic.AtomicLong;
         description = "Device Monitor")
 public class DeviceMonitorCommand extends AbstractShellCommand {
 
-    DeviceMonitorService deviceMonitorService;
+    private DeviceMonitorService deviceMonitorService;
+
+    private DeviceMonitorAdminService deviceMonitorAdminService;
 
     @Reference(cardinality = ReferenceCardinality.MANDATORY_UNARY)
     protected DeviceService deviceService;
@@ -33,11 +31,27 @@ public class DeviceMonitorCommand extends AbstractShellCommand {
             required = false, multiValued = false)
     String param1 = null;
 
+    @Argument(index = 1, name = "p2", description = "param2",
+            required = false, multiValued = false)
+    String param2 = null;
+
+    @Argument(index = 2, name = "p3", description = "param3",
+            required = false, multiValued = false)
+    String param3 = null;
+
+    private final String SET = "set";
+
+    private final String DEVICE = "device";
+
+    private final String FORBIDDENS = "forbiddens";
+
+    private final String MAX = "max";
     @Override
     protected void execute() {
-        //show all data we know
+        deviceMonitorService = get(DeviceMonitorService.class);
+        deviceMonitorAdminService = get(DeviceMonitorAdminService.class);
+        //default:show all data we know
         if (StringUtils.isEmpty(param1)) {
-            deviceMonitorService = get(DeviceMonitorService.class);
             print("Device Monitor result:");
             print("Device max connect times:%d", deviceMonitorService.getDeviceMaxConnectTimes());
             Set<Map.Entry<DeviceId, Long>> deviceCountSet =  deviceMonitorService.getDeviceCountAll();
@@ -45,12 +59,51 @@ public class DeviceMonitorCommand extends AbstractShellCommand {
             for (Map.Entry<DeviceId, Long> deviceCount : deviceCountSet) {
                 print("DeviceId:%s  connnetTimes:%s", deviceCount.getKey(), deviceCount.getValue());
             }
-            Set<DeviceId> forbidenSet = deviceMonitorService.getForbiddenDevices();
+            Set<DeviceId> forbiddenSet = deviceMonitorService.getForbiddenDevices();
             print("Forbidden devices list:");
-            for (DeviceId deviceId : forbidenSet) {
+            for (DeviceId deviceId : forbiddenSet) {
                 print(deviceId.toString());
             }
+            return;
         }
 
+        //get a device connect count record
+        if (DEVICE.equalsIgnoreCase(param1)) {
+            if (StringUtils.isEmpty(param2)) {
+                print("command syntax error,syntax: dm device [DeviceId], like:");
+                print("dm device of:0000000000000001");
+                return;
+            }
+            DeviceId deviceId = DeviceId.deviceId(param2);
+            long count = deviceMonitorService.getDeviceCount(deviceId);
+            print("The device connect times:%d", count);
+            return;
+        }
+        //get forbidden devices
+        if (FORBIDDENS.equalsIgnoreCase(param1)) {
+            Set<DeviceId> forbiddenSet = deviceMonitorService.getForbiddenDevices();
+            print("Forbidden devices list,%d devices:", forbiddenSet.size());
+            for (DeviceId deviceId : forbiddenSet) {
+                print(deviceId.toString());
+            }
+            return;
+        }
+        //get permitted devices max connecte times
+        if (MAX.equalsIgnoreCase(param1)) {
+            print(String.valueOf(deviceMonitorService.getDeviceMaxConnectTimes()));
+            return;
+        }
+        //set permitted device max connecte times
+        if (SET.equalsIgnoreCase(param1)) {
+            if (StringUtils.isEmpty(param2) || StringUtils.isEmpty(param3) && !param2.equalsIgnoreCase(SET)) {
+                print("command syntax error,syntax: dm set max [num], like:");
+                print("dm set max 2");
+                return;
+            }
+            long max = Long.valueOf(param3);
+            deviceMonitorAdminService.setDeviceMaxConnectTime(max);
+            print("Successfuly set the device max connecte times:%d", max);
+            return;
+        }
     }
 }

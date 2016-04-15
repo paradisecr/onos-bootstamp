@@ -8,7 +8,6 @@ import org.onosproject.mastership.MastershipService;
 import org.onosproject.net.Device;
 import org.onosproject.net.DeviceId;
 import org.onosproject.net.device.*;
-import org.onosproject.store.Timestamp;
 import org.onosproject.store.serializers.KryoNamespaces;
 import org.onosproject.store.service.*;
 import org.slf4j.Logger;
@@ -18,8 +17,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by cr on 16-4-15.
@@ -71,11 +68,11 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
 
     @Deactivate
     protected void deactivate() {
-        log.info("Stopped");
-        //clear all data set
-        destroyStorage();
         //remove DeviceListener from DeviceService
         deviceService.removeListener(deviceListener);
+        //clear all data set
+        destroyStorage();
+        log.info("Stopped");
     }
 
     private void  createStorage() {
@@ -93,6 +90,13 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
     private void destroyStorage() {
         forbiddenDevices.destroy();
         maxConnnectTimes.destroy();
+        for (Device device: deviceService.getDevices()) {
+            AtomicCounter count = storageService.atomicCounterBuilder()
+                    .withName(device.id().toString())
+                    .build()
+                    .asAtomicCounter();
+            count.destroy();
+        }
     }
 
     private void deviceConnect(Device device) {
@@ -103,7 +107,7 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
                 .build()
                 .asAtomicCounter();
         prvCount.incrementAndGet();
-        if (isForbidden(deviceId)) {
+        if (isDorbiddenDevice(deviceId)) {
             handleForbidenConnect(deviceId);
             return;
         }
@@ -116,9 +120,6 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
         forbiddenDevices.add(deviceId);
     }
 
-    private boolean isForbidden(DeviceId deviceId) {
-        return forbiddenDevices.contains(deviceId);
-    }
 
     private void handleForbidenConnect(DeviceId deviceId) {
         deviceAdminService.removeDevice(deviceId);
@@ -139,7 +140,11 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
 
     @Override
     public Long getDeviceCount(DeviceId deviceId) {
-        return null;
+        AtomicCounter count = storageService.atomicCounterBuilder()
+                .withName(deviceId.toString())
+                .build()
+                .asAtomicCounter();
+        return count.get();
     }
 
     @Override
@@ -157,14 +162,37 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
     }
 
     @Override
+    public boolean isDorbiddenDevice(DeviceId deviceId) {
+        return forbiddenDevices.contains(deviceId);
+    }
+
+    @Override
     public void setDeviceMaxConnectTime(long maxTime) {
         maxConnnectTimes.set(maxTime);
-        //for ()
+        for (DeviceId deviceId : forbiddenDevices) {
+            if (getDeviceCount(deviceId) < maxTime) {
+                forbiddenDevices.remove(deviceId);
+            }
+        }
+        for (Map.Entry<DeviceId, Long> deviceCountMap : getDeviceCountAll()) {
+            if (getDeviceCount(deviceCountMap.getKey()) < maxConnnectTimes.get()) {
+                forbiddenDevices.remove(deviceCountMap.getKey());
+            } else if (getDeviceCount(deviceCountMap.getKey()) < maxConnnectTimes.get()) {
+                forbiddenDevices.add(deviceCountMap.getKey());
+            }
+        }
     }
 
     @Override
     public void setDeviceConnectCount(DeviceId deviceId, long count) {
-
+        AtomicCounter prvCount = storageService.atomicCounterBuilder()
+                .withName(deviceId.toString())
+                .build()
+                .asAtomicCounter();
+        if (isDorbiddenDevice(deviceId) && prvCount.get() < count) {
+            forbiddenDevices.remove(deviceId);
+        }
+        prvCount.set(count);
     }
 
     private class InnerDeviceListener implements DeviceListener {
