@@ -71,7 +71,7 @@ public class DeviceMonitorManagement implements DeviceMonitorService, DeviceMoni
         //remove DeviceListener from DeviceService
         deviceService.removeListener(deviceListener);
         //clear all data set
-        destroyStorage();
+        //destroyStorage();
         log.info("Stopped");
     }
 
