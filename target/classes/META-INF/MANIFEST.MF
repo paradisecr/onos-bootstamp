@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bnd-LastModified: 1460742088419
+Build-Jdk: 1.8.0_77
+Built-By: cr
+Bundle-Blueprint: OSGI-INF/blueprint/shell-config.xml
+Bundle-Description: ONOS OSGi bundle archetype
+Bundle-License: http://www.apache.org/licenses/LICENSE-2.0.txt
+Bundle-ManifestVersion: 2
+Bundle-Name: device-monitor
+Bundle-SymbolicName: org.onosproject.device-monitor
+Bundle-Version: 1.5.0
+Created-By: Apache Maven Bundle Plugin
+Export-Package: org.onosproject.bootcamp;uses:="org.apache.karaf.shell.c
+ ommands,org.onosproject.cli,org.onosproject.mastership,org.onosproject.
+ net,org.onosproject.net.device,org.onosproject.store.service";version="
+ 1.5.0"
+Import-Package: org.apache.commons.lang;version="[2.6,3)",org.apache.kar
+ af.shell.commands;version="[3.0,4)",org.onlab.util;version="[1.5,2)",or
+ g.onosproject.cli;version="[1.5,2)",org.onosproject.event;version="[1.5
+ ,2)",org.onosproject.mastership;version="[1.5,2)",org.onosproject.net;v
+ ersion="[1.5,2)",org.onosproject.net.device;version="[1.5,2)",org.onosp
+ roject.store.primitives;version="[1.5,2)",org.onosproject.store.seriali
+ zers;version="[1.5,2)",org.onosproject.store.service;version="[1.5,2)",
+ org.osgi.service.blueprint;version="[1.0.0,2.0.0)",org.slf4j;version="[
+ 1.7,2)"
+Require-Capability: osgi.ee;filter:="(&(osgi.ee=JavaSE)(version=1.8))"
+Service-Component: OSGI-INF/org.onosproject.bootcamp.DeviceMonitorManage
+ ment.xml
+Tool: Bnd-3.0.0.201509101326
