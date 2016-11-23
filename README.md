@@ -1,1 +1,2 @@
 # onos-bootstamp
+An app which an count the times of devices up and down. The app would run on every ONOS instance of a cluster, and we could use CLI to check the results on any ONOS instance. When some device gets up and down for X ( X can be configured by CLI) times or more, the app will  disable the device automatically. Read the "Group7_Q6 Reliazation of extra features in device monitor -v1 20160415.pptx" for more information.
